@@ -1,0 +1,59 @@
+function answer = OxygenLevel(req)
+
+req = round(req);
+x= [0 1992.000000000001 1996.000000000001 2000.000000000001 2004.000000000001 2008.000000000001 2012.000000000001 2016.000000000001 2040.0000000001];
+y= [0 -114.02 -198.79 -243.06 -343.49 -452.19 -489.99 -642.13 -1500]; % Predicted value for 2040 is -1500
+mytable = [];
+mypi =0;
+
+rows = length(y);
+cols = rows+1;
+h = x(2) - x(1);
+
+mytable = zeros(rows, cols);
+
+% add data to the mytable
+for i = 1:rows
+    mytable(i, 1) = x(i);
+    mytable(i, 2) = y(i);
+end
+
+% find the deltas
+n = 1;
+for j = 3:cols
+    for i = 1:rows-n
+        mytable(i, j) = mytable(i+1, j-1) - mytable(i, j-1);
+    end
+    n = n +1;
+end
+
+% find the y0
+p = 0;
+for i = 1:rows
+   temp = (req-x(i))/h;
+   if(( temp > 0 && temp < 1))
+        p = (req-x(i+1))/h;
+        mypi = i+1;
+        
+   end
+end
+
+%final answer
+answer = mytable(mypi, 2);
+
+r = 1;
+n = 1;
+for i = 2:rows
+    r = r * (p+i-2);
+    if(mypi-n < 1)
+        break;
+    end
+    answer = answer + (r * (mytable(mypi-n, i+1)/factorial(i-1)));
+    n = n + 1;
+end
+
+disp(mytable);
+
+%fprintf('Final answer is: %f\n', answer);
+end
+
